@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Garden Picnic Night · CMA General Store</title>
+  <meta name="description" content="จัดตะกร้าของที่ระลึกจากสวนแห่งความทรงจำ ในร้านพิกเซลแสนอบอุ่นของ CMA Garden Picnic Night">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <div class="brand-badge">
+        <span class="tag">CMA</span>
+        <span class="title">BACK TO BASIC</span>
+      </div>
+      <div class="top-actions">
+        <button id="muteBtn" class="btn-pixel-icon" title="เปิด/ปิดเสียง">🔊</button>
+        <button id="resetBtn" class="btn-pixel-icon" title="เริ่มใหม่">🔄</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-eyebrow"><span></span> A LITTLE SHOP, A LOVELY NIGHT</div>
+      <h1>Garden<br><em>Picnic Night.</em><span class="hero-star" aria-hidden="true">✦</span></h1>
+      <p>เก็บความทรงจำดี ๆ กลับบ้าน<br>จัดตะกร้าของที่ระลึกในแบบของคุณ</p>
+      <div class="hero-note"><span aria-hidden="true">✧</span> Made of little moments & lovely things</div>
+    </section>
+    <div class="store-layout">
+    <div class="shop-column">
+    <div class="section-heading"><div><span class="eyebrow">01 / THE GENERAL STORE</span><h2>แวะมาเก็บความสุขกัน</h2></div><span class="open-label"><i></i> ร้านเปิดแล้ว</span></div>
+    <!-- Dialogue Box -->
+    <section class="dialogue-box">
+      <div id="dialoguePortrait" class="dialogue-portrait"></div>
+      <div class="dialogue-copy"><span class="keeper-name">พี่คนสวน <span>· เจ้าของร้าน</span></span><div id="dialogueText" class="dialogue-text" aria-live="polite">
+        "ยินดีต้อนรับสู่ร้านค้าปิกนิกครับ! แตะเลือกผลไม้บนชั้นวางได้เลย เดี๋ยวผมเดินไปหยิบมาใส่ตะกร้าให้ครับ"
+      </div></div>
+    </section>
+
+    <!-- CENTER STAGE: The 8-bit Shop Room (Stardew Valley Interior) -->
+    <section class="shop-stage-wrapper">
+      <div id="shopRoom" class="shop-room">
+        
+        <!-- Back Wall & Sign -->
+        <div class="shop-back-wall">
+          <div class="wall-lantern"></div>
+          <div class="wall-sign">★ CMA PICNIC STORE ★</div>
+          <div class="wall-lantern"></div>
+        </div>
+
+        <!-- Center Floor Rug -->
+        <div class="shop-rug"></div>
+
+        <!-- Left Fruit Shelves -->
+        <div class="shop-shelf left">
+          <div class="shelf-header">สดจากสวนไทย</div>
+          <div id="shelfLeftCrates" class="shelf-crates"></div>
+        </div>
+
+        <!-- Right Fruit Shelves -->
+        <div class="shop-shelf right">
+          <div class="shelf-header">ผลไม้ไทย</div>
+          <div id="shelfRightCrates" class="shelf-crates"></div>
+        </div>
+
+        <!-- Animated Shopkeeper Actor -->
+        <div id="shopkeeperActor" class="shopkeeper-actor">
+          <div id="actorSprite" class="actor-sprite"></div>
+          <div id="carriedItemBubble" class="carried-item-bubble"></div>
+        </div>
+
+        <!-- The basket sits at the center of the shop floor, between the shelves. -->
+        <button type="button" class="center-basket" id="counterBasketClick" aria-label="ดูของในตะกร้า">
+          <span id="counterBasketIcon" class="counter-basket-icon"></span>
+          <span class="basket-title-text">ตะกร้าของคุณ</span>
+          <span id="basketCountBadge" class="basket-count-badge" aria-live="polite">0 ชิ้น</span>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Quick Fruit Chips (Mobile friendly tap tray) -->
+    <section class="quick-picker-bar">
+      <div class="quick-picker-title"><span class="eyebrow">PICK A LITTLE HAPPINESS</span><h3>เลือกผลไม้ไทยใส่ตะกร้า</h3><p>ผลไม้ไทย 12 ชนิด · แตะเลือกได้ทั้งบนชั้นและด้านล่าง</p></div>
+      <div id="quickFruitChips" class="quick-fruit-chips"></div>
+    </section>
+
+    <div class="shop-footnote"><span>✦</span> แตะเลือก · คนสวนจัดให้ · เก็บความประทับใจกลับบ้าน</div>
+    </div>
+    <!-- Lower Half: Basket Inventory & Souvenirs in Basket -->
+    <main class="lower-content">
+      <div class="basket-tray-card">
+        <div class="tray-title">
+          <div><span class="eyebrow">02 / YOUR LITTLE COLLECTION</span><h3>ตะกร้าของคุณ</h3></div>
+          <span id="trayBadge" class="tray-badge">0 รายการ</span>
+        </div>
+
+        <div id="basketItemsGrid" class="basket-items-grid">
+          <!-- Filled dynamically by app.js -->
+        </div>
+      </div>
+      <div class="collection-note"><span>✧</span><div><strong>หนึ่งตะกร้า หลายความทรงจำ</strong><p>บรรจุในตะกร้าปิกนิกสาน<br>พร้อมรับที่ซุ้มของที่ระลึกในวันงาน</p></div></div>
+    <!-- Sticky Bottom Checkout Bar -->
+    <div class="bottom-order-bar">
+      <div class="price-summary">
+        <span class="price-sub">ราคาต่อเซ็ต</span>
+        <span class="price-total">฿1,290</span>
+      </div>
+      <button id="btnOrderAction" class="btn-order-action" disabled>
+        🧺 เลือกผลไม้อย่างน้อย 1 ชิ้น
+      </button>
+    </div>
+
+    </main>
+    </div>
+    <footer class="site-footer"><span>CMA · BACK TO BASIC</span><span>A night to remember, a little something to keep.</span><span>✦ GARDEN PICNIC NIGHT</span></footer>
+
+    <!-- Modal: Checkout Form -->
+    <div id="checkoutModal" class="modal-backdrop">
+      <div class="pixel-modal">
+        <div class="modal-header">
+          <div class="modal-title">ยืนยันข้อมูลผู้รับของที่ระลึก</div>
+          <button id="btnCloseCheckout" class="btn-close-modal">✕</button>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="custName">ชื่อ - นามสกุล</label>
+          <input type="text" id="custName" class="form-input" value="คุณธีรภัทร ชาญวิริยะ (วตท. 32)">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="custPhone">เบอร์โทรศัพท์</label>
+          <input type="tel" id="custPhone" class="form-input" value="089-123-4567">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">สถานที่รับของ</label>
+          <input type="text" class="form-input" value="ซุ้มของที่ระลึก งาน Garden Picnic Night" readonly style="opacity: 0.85;">
+        </div>
+
+        <button id="btnGoToQR" class="btn-order-action" style="width: 100%; justify-content: center; margin-top: 10px;">
+          ดำเนินการชำระเงิน (PromptPay) ▶
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal: PromptPay QR -->
+    <div id="qrModal" class="modal-backdrop">
+      <div class="pixel-modal">
+        <div class="modal-header">
+          <div class="modal-title">สแกนชำระเงิน PromptPay</div>
+          <button id="btnCloseQR" class="btn-close-modal">✕</button>
+        </div>
+
+        <p class="demo-note">ตัวอย่างการสั่งจอง · QR นี้ใช้สาธิตเท่านั้น</p>
+        <div class="qr-container">
+          <div style="font-size: 11px; font-weight: bold; color: #003b71; margin-bottom: 6px;">THAI QR PAYMENT</div>
+          <div id="qrBox" class="qr-box"></div>
+          <div style="font-size: 11px; color: #444; margin-top: 6px;">สถาบันวิทยาการตลาดทุน (วตท.)</div>
+          <div style="font-family: var(--font-pixel); font-size: 12px; color: #003b71; margin-top: 4px;">1,290.00 THB</div>
+        </div>
+
+        <button id="btnPaidConfirm" class="btn-order-action" style="width: 100%; justify-content: center;">
+          ✓ จำลองการชำระเงินสำเร็จ
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal: Voucher Ticket -->
+    <div id="ticketModal" class="modal-backdrop">
+      <div class="pixel-modal">
+        <div class="modal-header">
+          <div class="modal-title">บัตรรับของที่ระลึก (Voucher Ticket)</div>
+          <button id="btnCloseTicket" class="btn-close-modal">✕</button>
+        </div>
+
+        <div class="pixel-ticket">
+          <div class="ticket-header">
+            <div class="ticket-cma-logo">★ CMA GARDEN PICNIC ★</div>
+            <div class="ticket-subtitle">Souvenir Pick-Up Pass</div>
+          </div>
+
+          <div style="font-size: 10.5px; line-height: 1.4; margin-bottom: 6px;">
+            <div><b>ผู้รับ:</b> <span id="ticketHolderName">-</span></div>
+            <div><b>เบอร์โทร:</b> <span id="ticketHolderPhone">-</span></div>
+            <div><b>สถานะ:</b> <span style="color: #27793b; font-weight: bold;">DEMO (ตั๋วตัวอย่าง)</span></div>
+          </div>
+
+          <div class="ticket-items-list">
+            <div><b>รายการของในตะกร้าสาน:</b></div>
+            <div id="ticketItemsSummary" style="margin-top: 2px; color: #555;">-</div>
+          </div>
+
+          <div id="ticketQrBox" class="ticket-qr"></div>
+          <div id="ticketCodeDisplay" style="font-family: var(--font-pixel); font-size: 9px; text-align: center;">CMA-0000</div>
+        </div>
+
+        <button id="btnSaveTicket" class="btn-order-action" style="width: 100%; justify-content: center; margin-top: 10px;">
+          💾 บันทึกตั๋วลงเครื่อง
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
