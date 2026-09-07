@@ -1,5 +1,6 @@
 import { SPRITES } from './sprites.js';
 import { retroAudio } from './audio.js';
+import { setupHarvestGame } from './game.js';
 
 // Thai fruit selection; both shelves get six items, with no covered bottom row.
 const FRUITS = [
@@ -19,6 +20,12 @@ const FRUITS = [
   id, name, targetSouvenir: 'freshFruits',
   souvenirTitle: name, tag: 'ผลไม้ไทย', icon: SPRITES.fruits[id]
 }));
+
+const SHORT_NAMES = {
+  mango: 'มะม่วง', mangosteen: 'มังคุด', rambutan: 'เงาะ', durian: 'ทุเรียน',
+  pineapple: 'สับปะรด', banana: 'กล้วย', coconut: 'มะพร้าว', longan: 'ลำไย',
+  lychee: 'ลิ้นจี่', watermelon: 'แตงโม', guava: 'ฝรั่ง', orange: 'ส้ม'
+};
 
 const HOME_POS = { x: 50, y: 27 };
 
@@ -127,7 +134,7 @@ function renderShopCrates() {
       crate.setAttribute('aria-label', 'เลือก ' + fruit.name);
       crate.className = 'fruit-crate';
       crate.id = `crate-${fruit.id}`;
-      crate.innerHTML = `<span class="crate-icon">${fruit.icon}</span><span class="crate-name">${fruit.name}</span>`;
+      crate.innerHTML = `<span class="crate-icon">${fruit.icon}</span><span class="crate-name">${SHORT_NAMES[fruit.id]}</span>`;
       crate.addEventListener('click', () => onFruitSelected(fruit));
       shelf.appendChild(crate);
     });
@@ -166,6 +173,7 @@ function onFruitSelected(fruit) {
   if (state.isShopkeeperBusy) return;
   state.isShopkeeperBusy = true;
   el.resetBtn.disabled = true;
+  document.getElementById('enterGame').disabled = true;
   document.querySelectorAll('.fruit-chip, .fruit-crate').forEach(c => { c.disabled = true; });
 
   // Highlight selected crate
@@ -227,6 +235,7 @@ function onFruitSelected(fruit) {
             setActorPos(HOME_POS.x, HOME_POS.y);
             state.isShopkeeperBusy = false;
             el.resetBtn.disabled = false;
+            document.getElementById('enterGame').disabled = false;
             document.querySelectorAll('.fruit-chip, .fruit-crate').forEach(c => { c.disabled = false; });
           }, 300);
         }, 150);
@@ -395,4 +404,16 @@ document.getElementById('counterBasketClick').addEventListener('click', () => {
 });
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') document.querySelectorAll('.modal-backdrop.active').forEach(modal => modal.classList.remove('active'));
+});
+
+setupHarvestGame({
+  fruits: FRUITS,
+  canOpen: () => !state.isShopkeeperBusy,
+  getCount: () => state.basketItems.length,
+  onCollect: fruit => {
+    state.basketItems.push(fruit);
+    retroAudio.playHarvest();
+    updateBasketUI();
+    speak(`เก็บ <b>${fruit.name}</b> ลงตะกร้าแล้วครับ!`);
+  }
 });
