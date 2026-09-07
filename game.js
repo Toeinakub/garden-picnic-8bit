@@ -1,14 +1,15 @@
 import { SPRITES } from './sprites.js';
 import { WORLD, BASKET, STATIONS, movePlayer, nearestStation } from './game-physics.js';
 
-export function setupHarvestGame({ fruits, onCollect, getCount, canOpen }) {
+export function setupHarvestGame({ fruits, onCollect, getItems, canOpen }) {
   const dialog = document.createElement('dialog');
   dialog.className = 'harvest-game';
   dialog.tabIndex = -1;
   dialog.setAttribute('aria-labelledby', 'gameTitle');
   dialog.innerHTML = `
     <header class="game-header"><div><span class="eyebrow">GARDEN PICNIC · PLAY MODE</span><h2 id="gameTitle">เดินเล่น เก็บผลไม้ไทย</h2></div><button class="game-close" aria-label="ออกจากเกม">กลับร้าน ✕</button></header>
-    <div class="game-hud"><span id="gameHint" role="status">เดินเข้าใกล้ผลไม้ แล้วกดเก็บ</span><span id="gameCount"></span></div>
+    <div class="game-hud"><span id="gameHint" role="status">เดินเข้าใกล้ผลไม้ แล้วกดเก็บ</span><button id="gameCount" aria-label="ดูรายการผลไม้ในตะกร้า" aria-haspopup="dialog"></button></div>
+    <div class="game-collected" aria-label="ผลไม้ที่เก็บแล้ว"></div>
     <div class="game-viewport"><div class="game-world" aria-label="สวนผลไม้ไทย">
       <div class="game-rug"></div>
       ${STATIONS.map((s, i) => `<div class="game-station" data-station="${i}" style="left:${s.x}px;top:${s.y}px" aria-label="${fruits[i].name}"><span>${fruits[i].icon}</span><small>${fruits[i].name}</small></div>`).join('')}
@@ -18,7 +19,12 @@ export function setupHarvestGame({ fruits, onCollect, getCount, canOpen }) {
     <div class="game-controls">
       <div class="joystick-side"><div class="game-joystick" aria-label="จอยเดินทุกทิศทาง" role="group"><span class="joy-arrows" aria-hidden="true">↟</span><span class="joy-knob"></span></div><span>ลากจอยเพื่อเดิน</span></div>
       <div class="harvest-side"><button id="harvestAction" disabled>เข้าใกล้ผลไม้</button><span>คอมพิวเตอร์: ลูกศร / WASD · Space เก็บ</span></div>
-    </div>`;
+    </div>
+    <dialog class="game-inventory" aria-labelledby="inventoryTitle">
+      <header><div><h2 id="inventoryTitle">ผลไม้ในตะกร้า</h2><p id="inventoryTotal"></p></div><button class="inventory-close" aria-label="ปิดรายการผลไม้">✕</button></header>
+      <div class="inventory-items"></div>
+      <button class="inventory-continue">กลับไปเก็บผลไม้</button>
+    </dialog>`;
   document.body.append(dialog);
   const viewport = dialog.querySelector('.game-viewport');
   const world = dialog.querySelector('.game-world');
@@ -29,7 +35,69 @@ export function setupHarvestGame({ fruits, onCollect, getCount, canOpen }) {
   const joystick = dialog.querySelector('.game-joystick');
   const knob = dialog.querySelector('.joy-knob');
   const stations = [...dialog.querySelectorAll('.game-station')];
+  const collected = dialog.querySelector('.game-collected');
+  const inventory = dialog.querySelector('.game-inventory');
+  const inventoryItems = dialog.querySelector('.inventory-items');
+  const basketSprite = dialog.querySelector('.game-basket');
+  const flights = [];
   const keys = new Set();
+
+  function renderCollection() {
+    const items = getItems();
+    const groups = fruits.map(fruit => ({
+      fruit, quantity: items.filter(item => item.id === fruit.id).length
+    })).filter(group => group.quantity > 0);
+    count.textContent = `ตะกร้า ${items.length} ชิ้น`;
+    collected.innerHTML = groups.length
+      ? '<span class="collected-label">เก็บแล้ว</span>' + groups.map(({fruit, quantity}) =>
+        `<span class="collected-chip" aria-label="${fruit.name} ${quantity} ชิ้น" title="${fruit.name}"><span>${fruit.icon}</span><b>×${quantity}</b></span>`).join('')
+      : '<span class="collection-empty">ตะกร้ายังว่าง · เดินไปเก็บผลไม้กัน</span>';
+    dialog.querySelector('#inventoryTotal').textContent = `${groups.length} ชนิด · ${items.length} ชิ้น`;
+    inventoryItems.innerHTML = groups.length
+      ? groups.map(({fruit, quantity}) => `<div class="inventory-row"><span class="inventory-icon">${fruit.icon}</span><span>${fruit.name}</span><strong>×${quantity}</strong></div>`).join('')
+      : '<p class="inventory-empty">ยังไม่มีผลไม้ในตะกร้า<br>เข้าใกล้ชั้นผลไม้แล้วกดเก็บได้เลย</p>';
+    stations.forEach((station, i) => {
+      const quantity = items.filter(item => item.id === fruits[i].id).length;
+      station.querySelector('.station-collected')?.remove();
+      if (quantity) {
+        const badge = document.createElement('b');
+        badge.className = 'station-collected';
+        badge.textContent = `✓ ${quantity}`;
+        station.append(badge);
+      }
+    });
+  }
+
+  function animateHarvest(fruit, source, now) {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const sprite = document.createElement('div');
+    sprite.className = 'flying-fruit';
+    sprite.setAttribute('aria-hidden', 'true');
+    sprite.innerHTML = fruit.icon;
+    world.append(sprite);
+    flights.push({ sprite, source, start: now });
+    updateFlights(now);
+  }
+
+  function updateFlights(now) {
+    for (let i = flights.length - 1; i >= 0; i--) {
+      const flight = flights[i];
+      const t = Math.min(1, (now - flight.start) / 800);
+      const ease = t * t * (3 - 2 * t);
+      const x = flight.source.x + (BASKET.x - flight.source.x) * ease;
+      const y = flight.source.y + (BASKET.y - flight.source.y) * ease - Math.sin(Math.PI * t) * 115;
+      flight.sprite.style.left = x + 'px';
+      flight.sprite.style.top = y + 'px';
+      flight.sprite.style.transform = `translate(-50%, -50%) scale(${1 + Math.sin(Math.PI * t) * .35 - t * .65}) rotate(${Math.sin(Math.PI * t) * 18}deg)`;
+      if (t === 1) {
+        flight.sprite.remove();
+        flights.splice(i, 1);
+        basketSprite.classList.remove('basket-catch');
+        void basketSprite.offsetWidth;
+        basketSprite.classList.add('basket-catch');
+      }
+    }
+  }
   let player = { x: 360, y: 205 };
   let stick = { x: 0, y: 0 };
   let pointer = null;
@@ -60,11 +128,12 @@ export function setupHarvestGame({ fruits, onCollect, getCount, canOpen }) {
   function harvest() {
     const now = performance.now();
     target = nearestStation(player);
-    if (!dialog.open || !target || now < cooldown) return;
+    if (!dialog.open || inventory.open || !target || now < cooldown) return;
     cooldown = now + 550;
     const fruit = fruits[target.index];
     onCollect(fruit);
-    count.textContent = `ตะกร้า ${getCount()} ชิ้น`;
+    animateHarvest(fruit, target, now);
+    renderCollection();
     hint.textContent = `✓ เก็บ${fruit.name}ลงตะกร้าแล้ว`;
     messageUntil = now + 1300;
     const station = stations[target.index];
@@ -77,6 +146,8 @@ export function setupHarvestGame({ fruits, onCollect, getCount, canOpen }) {
     if (!dialog.open) return;
     const dt = previous ? (now - previous) / 1000 : 0;
     previous = now;
+    updateFlights(now);
+    if (inventory.open) { raf = requestAnimationFrame(tick); return; }
     const keyX = Number(keys.has('ArrowRight') || keys.has('d')) - Number(keys.has('ArrowLeft') || keys.has('a'));
     const keyY = Number(keys.has('ArrowDown') || keys.has('s')) - Number(keys.has('ArrowUp') || keys.has('w'));
     const direction = pointer === null ? { x: keyX, y: keyY } : stick;
@@ -107,25 +178,44 @@ export function setupHarvestGame({ fruits, onCollect, getCount, canOpen }) {
     cooldown = 0;
     messageUntil = 0;
     clearInput();
-    count.textContent = `ตะกร้า ${getCount()} ชิ้น`;
+    renderCollection();
     resize();
     raf = requestAnimationFrame(tick);
     dialog.focus();
   }
   dialog.addEventListener('close', () => {
+    if (inventory.open) inventory.close();
     cancelAnimationFrame(raf);
+    flights.splice(0).forEach(flight => flight.sprite.remove());
+    basketSprite.classList.remove('basket-catch');
     clearInput();
     document.body.style.overflow = oldOverflow;
     returnFocus?.focus({ preventScroll: true });
   });
   dialog.querySelector('.game-close').addEventListener('click', () => dialog.close());
   action.addEventListener('click', harvest);
+  count.addEventListener('click', () => {
+    clearInput();
+    renderCollection();
+    inventory.showModal();
+    inventory.querySelector('.inventory-close').focus();
+  });
+  inventory.querySelector('.inventory-close').addEventListener('click', () => inventory.close());
+  inventory.querySelector('.inventory-continue').addEventListener('click', () => inventory.close());
+  inventory.addEventListener('close', event => {
+    // Nested dialog close must not trigger the game's cleanup handler.
+    event.stopPropagation();
+    clearInput();
+    previous = 0;
+    if (dialog.open) count.focus();
+  });
 
   const moveKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd'];
   dialog.addEventListener('keydown', event => {
+    if (inventory.open) return;
     const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
     if (moveKeys.includes(key)) { event.preventDefault(); keys.add(key); }
-    if (event.code === 'Space' && event.target !== dialog.querySelector('.game-close')) {
+    if (event.code === 'Space' && event.target !== dialog.querySelector('.game-close') && event.target !== count) {
       event.preventDefault();
       if (!event.repeat) harvest();
     }

@@ -409,7 +409,7 @@ document.addEventListener('keydown', event => {
 setupHarvestGame({
   fruits: FRUITS,
   canOpen: () => !state.isShopkeeperBusy,
-  getCount: () => state.basketItems.length,
+  getItems: () => state.basketItems,
   onCollect: fruit => {
     state.basketItems.push(fruit);
     retroAudio.playHarvest();

@@ -21,11 +21,11 @@ test('game opens, moves, harvests into shared basket, cancels joystick, closes a
   }
   window.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
   window.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new window.Event('close'));};
-  const fruits=Array.from({length:12},(_,i)=>({name:'fruit-'+i,icon:'🍊'}));
+  const fruits=Array.from({length:12},(_,i)=>({id:'fruit-'+i,name:'fruit-'+i,icon:'🍊'}));
   const basket=[];
   let busy=false;
   try {
-    setupHarvestGame({fruits,onCollect:fruit=>basket.push(fruit),getCount:()=>basket.length,canOpen:()=>!busy});
+    setupHarvestGame({fruits,onCollect:fruit=>basket.push(fruit),getItems:()=>basket,canOpen:()=>!busy});
     const doc=window.document, entry=doc.getElementById('enterGame');
     const dialog=doc.querySelector('dialog');
     const action=doc.getElementById('harvestAction');
@@ -47,6 +47,32 @@ test('game opens, moves, harvests into shared basket, cancels joystick, closes a
     assert.equal(doc.getElementById('gameCount').textContent,'ตะกร้า 1 ชิ้น');
     key('keydown',' ','Space');assert.equal(basket.length,1,'cooldown prevents double collect');
 
+
+    assert.equal(doc.querySelectorAll('.flying-fruit').length,1);
+    const flight=doc.querySelector('.flying-fruit');
+    const originalFlightTop=flight.style.top;
+    tick(10);
+    assert.notEqual(flight.style.top,originalFlightTop,'fruit travels toward basket');
+    tick(45);
+    assert.equal(doc.querySelectorAll('.flying-fruit').length,0,'completed flight is cleaned up');
+    assert.equal(doc.querySelector('.game-basket').classList.contains('basket-catch'),true);
+    key('keydown',' ','Space');tick();
+    assert.equal(basket.length,2);
+    assert.equal(doc.querySelectorAll('.collected-chip').length,1,'same fruit is grouped');
+    assert.equal(doc.querySelector('.collected-chip b').textContent,'×2');
+    doc.getElementById('gameCount').click();
+    const inventory=doc.querySelector('.game-inventory');
+    assert.equal(inventory.open,true);
+    assert.equal(doc.querySelector('#inventoryTotal').textContent,'1 ชนิด · 2 ชิ้น');
+    assert.equal(doc.querySelector('.inventory-row strong').textContent,'×2');
+    const paused=actor.style.top;
+    key('keydown','ArrowDown');tick(10);
+    assert.equal(actor.style.top,paused,'walking pauses while reviewing basket');
+    key('keydown',' ','Space');
+    assert.equal(basket.length,2,'cannot harvest through inventory');
+    doc.querySelector('.inventory-continue').click();
+    assert.equal(inventory.open,false);
+    assert.equal(dialog.open,true);
     const joy=doc.querySelector('.game-joystick');
     let captured=false;
     joy.getBoundingClientRect=()=>({left:0,top:0,width:116,height:116});
@@ -70,7 +96,20 @@ test('game opens, moves, harvests into shared basket, cancels joystick, closes a
     assert.equal(doc.activeElement,entry);
     entry.click();tick();
     assert.equal(actor.style.left,'360px');
-    assert.equal(doc.getElementById('gameCount').textContent,'ตะกร้า 1 ชิ้น');
+    assert.equal(doc.getElementById('gameCount').textContent,'ตะกร้า 2 ชิ้น');
+    assert.equal(doc.querySelectorAll('.flying-fruit').length,0,'closing cleans up in-flight fruit');
+    dialog.close();
+    basket.splice(0,1,fruits[4]);
+    entry.click();tick();
+    assert.equal(doc.querySelectorAll('.collected-chip').length,2,'reopening reads shared basket changes');
+    doc.getElementById('gameCount').click();
+    assert.equal(doc.querySelector('#inventoryTotal').textContent,'2 ชนิด · 2 ชิ้น');
+    doc.querySelector('.inventory-close').click();
+    window.matchMedia=()=>({matches:true});
+    key('keydown','ArrowUp');tick(20);key('keyup','ArrowUp');
+    key('keydown',' ','Space');tick();
+    assert.equal(basket.length,3);
+    assert.equal(doc.querySelectorAll('.flying-fruit').length,0,'reduced motion still collects without flight');
     dialog.close();
   } finally {
     dom.window.close();
