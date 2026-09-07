@@ -1,3 +1,20 @@
+// One shared face keeps the reference-inspired glasses, beard and smile consistent.
+// Half-pixel details add definition while preserving the existing pixel-art costume.
+function shopkeeperFace(y) {
+  return `<g transform="translate(0 ${y})">
+    <path d="M7 0h10v5H7z M8 5h8v1H8z M6 2h1v2H6z M17 2h1v2h-1z" fill="#d9a581"/>
+    <path d="M7 0h10v1H7z M6.5 1h1.5v2H6.5z M16 1h1.5v2H16z" fill="#292827"/>
+    <path d="M8 1h8v.5H8z" fill="#e8ba94"/>
+    <path d="M7 3.5h10V5H7z M8 5h8v1H8z" fill="#40312c"/>
+    <path d="M7 1.5h4.5v2H7z M12.5 1.5H17v2h-4.5z M11.5 2h1v.5h-1z" fill="#d9dce9"/>
+    <path d="M7.5 2H11v1H7.5z M13 2h3.5v1H13z" fill="#bea9a3"/>
+    <path d="M8.5 2h1v1h-1z M14 2h1v1h-1z" fill="#2c2928"/>
+    <path d="M11.5 2.5h1v1.5h-1z M8 3.5h1v.5H8z M15 3.5h1v.5h-1z" fill="#c99070"/>
+    <path d="M9 4h6v.5H9z M10 4.5h4v.5h-4z" fill="#fff0d7"/>
+    <path d="M10 5h4v.5h-4z" fill="#b87e68"/>
+  </g>`;
+}
+
 // 8-bit Pixel Art Sprites for Stardew Valley Style Shop & Items
 export const SPRITES = {
   // เจ้าของร้าน (Shopkeeper Character): Idle, Walk, and Carry
@@ -8,20 +25,14 @@ export const SPRITES = {
         <path d="M6 3 h12 v2 h-12 z" fill="#d9a543"/>
         <path d="M3 5 h18 v3 h-18 z" fill="#f0be5b"/>
         <path d="M8 5 h8 v2 h-8 z" fill="#2b5e39"/>
-        <!-- Face & Hair -->
-        <path d="M7 8 h10 v6 h-10 z" fill="#ffcca3"/>
-        <path d="M6 8 h2 v3 h-2 z M16 8 h2 v3 h-2 z" fill="#4d2f16"/>
-        <!-- Eyes & Smile -->
-        <path d="M9 10 h2 v2 h-2 z M13 10 h2 v2 h-2 z" fill="#241408"/>
-        <path d="M10 13 h4 v1 h-4 z" fill="#c46255"/>
-        <path d="M7 11 h2 v1 h-2 z M15 11 h2 v1 h-2 z" fill="#f79788"/>
+        ${shopkeeperFace(8)}
         <!-- Apron & Shirt -->
         <path d="M6 14 h12 v10 h-12 z" fill="#264e36"/>
         <path d="M9 14 h6 v9 h-6 z" fill="#3b7250"/>
         <path d="M10 17 h4 v3 h-4 z" fill="#f5e6cc"/>
         <!-- Arms / Hands -->
-        <path d="M4 15 h2 v6 h-2 z" fill="#ffcca3"/>
-        <path d="M18 15 h2 v6 h-2 z" fill="#ffcca3"/>
+        <path d="M4 15 h2 v6 h-2 z" fill="#d9a581"/>
+        <path d="M18 15 h2 v6 h-2 z" fill="#d9a581"/>
         <!-- Trousers & Boots -->
         <path d="M7 24 h4 v5 h-4 z M13 24 h4 v5 h-4 z" fill="#4a3b32"/>
         <path d="M6 29 h5 v3 h-5 z M13 29 h5 v3 h-5 z" fill="#241913"/>
@@ -33,18 +44,14 @@ export const SPRITES = {
         <path d="M6 2 h12 v2 h-12 z" fill="#d9a543"/>
         <path d="M3 4 h18 v3 h-18 z" fill="#f0be5b"/>
         <path d="M8 4 h8 v2 h-8 z" fill="#2b5e39"/>
-        <!-- Face & Hair -->
-        <path d="M7 7 h10 v6 h-10 z" fill="#ffcca3"/>
-        <path d="M6 7 h2 v3 h-2 z M16 7 h2 v3 h-2 z" fill="#4d2f16"/>
-        <path d="M9 9 h2 v2 h-2 z M13 9 h2 v2 h-2 z" fill="#241408"/>
-        <path d="M10 12 h4 v1 h-4 z" fill="#c46255"/>
+        ${shopkeeperFace(7)}
         <!-- Body -->
         <path d="M6 13 h12 v10 h-12 z" fill="#264e36"/>
         <path d="M9 13 h6 v9 h-6 z" fill="#3b7250"/>
         <path d="M10 16 h4 v3 h-4 z" fill="#f5e6cc"/>
         <!-- Arms Swinging -->
-        <path d="M4 13 h2 v5 h-2 z" fill="#ffcca3"/>
-        <path d="M18 16 h2 v5 h-2 z" fill="#ffcca3"/>
+        <path d="M4 13 h2 v5 h-2 z" fill="#d9a581"/>
+        <path d="M18 16 h2 v5 h-2 z" fill="#d9a581"/>
         <!-- Stride Leg 1 Forward, Leg 2 Back -->
         <path d="M5 23 h4 v6 h-4 z" fill="#4a3b32"/>
         <path d="M4 29 h5 v3 h-5 z" fill="#241913"/>
@@ -58,18 +65,14 @@ export const SPRITES = {
         <path d="M6 2 h12 v2 h-12 z" fill="#d9a543"/>
         <path d="M3 4 h18 v3 h-18 z" fill="#f0be5b"/>
         <path d="M8 4 h8 v2 h-8 z" fill="#2b5e39"/>
-        <!-- Face & Hair -->
-        <path d="M7 7 h10 v6 h-10 z" fill="#ffcca3"/>
-        <path d="M6 7 h2 v3 h-2 z M16 7 h2 v3 h-2 z" fill="#4d2f16"/>
-        <path d="M9 9 h2 v2 h-2 z M13 9 h2 v2 h-2 z" fill="#241408"/>
-        <path d="M10 12 h4 v1 h-4 z" fill="#c46255"/>
+        ${shopkeeperFace(7)}
         <!-- Body -->
         <path d="M6 13 h12 v10 h-12 z" fill="#264e36"/>
         <path d="M9 13 h6 v9 h-6 z" fill="#3b7250"/>
         <path d="M10 16 h4 v3 h-4 z" fill="#f5e6cc"/>
         <!-- Arms Swinging Reverse -->
-        <path d="M4 16 h2 v5 h-2 z" fill="#ffcca3"/>
-        <path d="M18 13 h2 v5 h-2 z" fill="#ffcca3"/>
+        <path d="M4 16 h2 v5 h-2 z" fill="#d9a581"/>
+        <path d="M18 13 h2 v5 h-2 z" fill="#d9a581"/>
         <!-- Stride Leg 2 Forward, Leg 1 Back -->
         <path d="M7 23 h4 v5 h-4 z" fill="#4a3b32"/>
         <path d="M6 28 h4 v3 h-4 z" fill="#241913"/>
@@ -82,13 +85,10 @@ export const SPRITES = {
         <!-- Straw Hat -->
         <path d="M6 6 h12 v2 h-12 z" fill="#d9a543"/>
         <path d="M3 8 h18 v3 h-18 z" fill="#f0be5b"/>
-        <!-- Face & Hair -->
-        <path d="M7 11 h10 v6 h-10 z" fill="#ffcca3"/>
-        <path d="M9 13 h2 v2 h-2 z M13 13 h2 v2 h-2 z" fill="#241408"/>
-        <path d="M10 16 h4 v1 h-4 z" fill="#c46255"/>
+        ${shopkeeperFace(11)}
         <!-- Arms Raised Up Carrying Item -->
-        <path d="M3 3 h3 v8 h-3 z" fill="#ffcca3"/>
-        <path d="M18 3 h3 v8 h-3 z" fill="#ffcca3"/>
+        <path d="M3 3 h3 v8 h-3 z" fill="#d9a581"/>
+        <path d="M18 3 h3 v8 h-3 z" fill="#d9a581"/>
         <!-- Body -->
         <path d="M6 17 h12 v8 h-12 z" fill="#264e36"/>
         <path d="M9 17 h6 v7 h-6 z" fill="#3b7250"/>
